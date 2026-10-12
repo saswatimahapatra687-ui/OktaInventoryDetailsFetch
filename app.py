@@ -27,7 +27,7 @@ st.set_page_config(
 
 with st.sidebar:
     st.title("🔐 Okta Inventory")
-    st.caption("Ross Stores — Okta Tenant Report")
+    st.caption("Okta Tenant Report")
     st.divider()
 
     org_url   = st.text_input("Okta Org URL", placeholder="https://your-org.okta.com")
@@ -94,7 +94,12 @@ col_title, col_dl = st.columns([5, 1])
 with col_title:
     subdomain = org.get("subdomain", "")
     company   = org.get("companyName", "")
-    label     = f"{company}  ·  {subdomain}.okta.com" if subdomain else company or "Okta Inventory"
+    domain    = f"{subdomain}.okta.com" if subdomain else ""
+    # Avoid repeating the tenant name when companyName just mirrors the subdomain
+    if company and subdomain and company.strip().lower() != subdomain.strip().lower():
+        label = f"{company}  ·  {domain}"
+    else:
+        label = domain or company or "Okta Inventory"
     st.subheader(label)
 with col_dl:
     st.download_button(
