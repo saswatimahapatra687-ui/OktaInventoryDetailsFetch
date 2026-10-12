@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Okta Inventory Script — Ross Stores
+Okta Inventory Script
 Pulls all Okta tenant data via API and exports to Excel.
 
 Usage:
@@ -314,7 +314,8 @@ def build_summary_sheet(wb, data, org):
     # Title block
     ws.merge_cells("A1:H1")
     c = ws["A1"]
-    c.value = "🔐  OKTA INVENTORY REPORT — ROSS STORES"
+    report_org = (org.get('companyName') or 'Okta Tenant').upper()
+    c.value = f"🔐  OKTA INVENTORY REPORT — {report_org}"
     c.fill = hfill(DARK_BLUE)
     c.font = hfont(bold=True, color=WHITE, size=16)
     c.alignment = halign("center")
@@ -322,7 +323,7 @@ def build_summary_sheet(wb, data, org):
 
     ws.merge_cells("A2:H2")
     c = ws["A2"]
-    c.value = f"Generated: {datetime.now().strftime('%B %d, %Y %H:%M')}    |    Org: {org.get('companyName', 'Ross Stores')}    |    Domain: {org.get('subdomain', '')}.okta.com"
+    c.value = f"Generated: {datetime.now().strftime('%B %d, %Y %H:%M')}    |    Org: {org.get('companyName', 'Okta Tenant')}    |    Domain: {org.get('subdomain', '')}.okta.com"
     c.fill = hfill(MED_BLUE)
     c.font = hfont(color=WHITE, size=10)
     c.alignment = halign("center")
@@ -1378,7 +1379,7 @@ def generate_demo_data():
         'SAP Concur','Office 365','GitHub Enterprise','Jira','Confluence',
         'Tableau','Snowflake','AWS SSO','Azure Portal','Google Workspace',
         'Zoom','Slack','DocuSign','Box','PeopleSoft HCM',
-        'Ross Intranet','IT Helpdesk Portal','Finance Portal','HR Self Service',
+        'Acme Intranet','IT Helpdesk Portal','Finance Portal','HR Self Service',
         'Benefits Portal','Payroll System','Learning Management System',
         'Expense Management','Procurement Portal','Security Dashboard'
     ]
@@ -1406,8 +1407,8 @@ def generate_demo_data():
         users.append({
             'id': f'00u{i:015d}',
             'profile': {'firstName': fn, 'lastName': ln,
-                        'email': f'{fn.lower()}.{ln.lower()}{i}@rossstores.com',
-                        'login': f'{fn.lower()}.{ln.lower()}{i}@rossstores.com'},
+                        'email': f'{fn.lower()}.{ln.lower()}{i}@acmecorp.com',
+                        'login': f'{fn.lower()}.{ln.lower()}{i}@acmecorp.com'},
             'status': 'ACTIVE',
             'created': f'202{random.randint(0,4)}-{random.randint(1,12):02d}-01T00:00:00.000Z',
             'lastLogin': f'2026-{random.randint(8,9):02d}-{random.randint(1,28):02d}T00:00:00.000Z',
@@ -1419,12 +1420,12 @@ def generate_demo_data():
          'profile': {'name': n, 'description': d}}
         for i, (n, t, d) in enumerate([
             ('Everyone', 'BUILT_IN', 'All users in org'),
-            ('Ross-Employees', 'OKTA_GROUP', 'All Ross Store employees'),
-            ('Ross-Contractors', 'OKTA_GROUP', 'External contractors'),
-            ('Ross-IT-Admins', 'OKTA_GROUP', 'IT Administrators'),
-            ('Ross-Finance', 'OKTA_GROUP', 'Finance department users'),
-            ('Ross-HR', 'OKTA_GROUP', 'Human Resources'),
-            ('Ross-Vendors', 'OKTA_GROUP', 'External vendor users'),
+            ('Acme-Employees', 'OKTA_GROUP', 'All Acme employees'),
+            ('Acme-Contractors', 'OKTA_GROUP', 'External contractors'),
+            ('Acme-IT-Admins', 'OKTA_GROUP', 'IT Administrators'),
+            ('Acme-Finance', 'OKTA_GROUP', 'Finance department users'),
+            ('Acme-HR', 'OKTA_GROUP', 'Human Resources'),
+            ('Acme-Vendors', 'OKTA_GROUP', 'External vendor users'),
             ('Vendor-Portal-Users', 'APP_GROUP', 'Users with Vendor Portal access'),
             ('Workday-Users', 'APP_GROUP', 'Users with Workday access'),
             ('ServiceNow-Users', 'APP_GROUP', 'Users with ServiceNow access'),
@@ -1432,7 +1433,7 @@ def generate_demo_data():
     ]
 
     idps = [
-        {'id': 'idp001', 'name': 'Ross Active Directory', 'type': 'ACTIVE_DIRECTORY',
+        {'id': 'idp001', 'name': 'Acme Active Directory', 'type': 'ACTIVE_DIRECTORY',
          'status': 'ACTIVE', 'protocol': {'type': 'LDAP'},
          'created': '2021-06-01T00:00:00.000Z', 'lastUpdated': '2026-01-15T00:00:00.000Z'},
         {'id': 'idp002', 'name': 'Azure AD Federation', 'type': 'MICROSOFT',
@@ -1474,14 +1475,14 @@ def generate_demo_data():
     ]
 
     auth_servers = [
-        {'id': 'aus001', 'name': 'Ross API Gateway', 'description': 'Custom OAuth server for internal APIs',
-         'audiences': ['api://ross-internal'], 'issuer': 'https://rossstores.okta.com/oauth2/aus001',
+        {'id': 'aus001', 'name': 'Acme API Gateway', 'description': 'Custom OAuth server for internal APIs',
+         'audiences': ['api://acme-internal'], 'issuer': 'https://acme.okta.com/oauth2/aus001',
          'status': 'ACTIVE', 'created': '2022-01-01T00:00:00.000Z', 'lastUpdated': '2026-01-01T00:00:00.000Z'},
         {'id': 'aus002', 'name': 'Vendor Portal Auth', 'description': 'OAuth server for vendor-facing APIs',
-         'audiences': ['api://ross-vendor'], 'issuer': 'https://rossstores.okta.com/oauth2/aus002',
+         'audiences': ['api://acme-vendor'], 'issuer': 'https://acme.okta.com/oauth2/aus002',
          'status': 'ACTIVE', 'created': '2022-06-01T00:00:00.000Z', 'lastUpdated': '2025-12-01T00:00:00.000Z'},
         {'id': 'aus003', 'name': 'Mobile Apps Auth', 'description': 'OAuth server for mobile applications',
-         'audiences': ['api://ross-mobile'], 'issuer': 'https://rossstores.okta.com/oauth2/aus003',
+         'audiences': ['api://acme-mobile'], 'issuer': 'https://acme.okta.com/oauth2/aus003',
          'status': 'INACTIVE', 'created': '2023-03-01T00:00:00.000Z', 'lastUpdated': '2025-06-01T00:00:00.000Z'},
     ]
 
@@ -1513,12 +1514,12 @@ def generate_demo_data():
     event_hooks = [
         {'id': 'whe001', 'name': 'User Lifecycle Events', 'status': 'ACTIVE',
          'verificationStatus': 'VERIFIED',
-         'channel': {'config': {'uri': 'https://automation.rossstores.com/okta/lifecycle'}},
+         'channel': {'config': {'uri': 'https://automation.acmecorp.com/okta/lifecycle'}},
          'events': {'items': ['user.lifecycle.activate', 'user.lifecycle.deactivate', 'user.lifecycle.suspend']},
          'created': '2023-01-01T00:00:00.000Z'},
         {'id': 'whe002', 'name': 'MFA Events', 'status': 'ACTIVE',
          'verificationStatus': 'VERIFIED',
-         'channel': {'config': {'uri': 'https://siem.rossstores.com/okta/mfa'}},
+         'channel': {'config': {'uri': 'https://siem.acmecorp.com/okta/mfa'}},
          'events': {'items': ['user.mfa.factor.activate', 'user.mfa.factor.deactivate']},
          'created': '2023-06-01T00:00:00.000Z'},
     ]
@@ -1526,11 +1527,11 @@ def generate_demo_data():
     inline_hooks = [
         {'id': 'cal001', 'name': 'Token Enrichment Hook', 'status': 'ACTIVE',
          'type': 'com.okta.oauth2.tokens.transform',
-         'channel': {'config': {'uri': 'https://api.rossstores.com/okta/token-hook'}},
+         'channel': {'config': {'uri': 'https://api.acmecorp.com/okta/token-hook'}},
          'created': '2023-03-01T00:00:00.000Z'},
         {'id': 'cal002', 'name': 'User Import Hook', 'status': 'ACTIVE',
          'type': 'com.okta.import.transform',
-         'channel': {'config': {'uri': 'https://api.rossstores.com/okta/import-hook'}},
+         'channel': {'config': {'uri': 'https://api.acmecorp.com/okta/import-hook'}},
          'created': '2023-09-01T00:00:00.000Z'},
     ]
 
@@ -1572,7 +1573,7 @@ def generate_demo_data():
     }
 
     return {
-        'org': {'companyName': 'Ross Stores Inc.', 'subdomain': 'ross'},
+        'org': {'companyName': 'Acme Corporation', 'subdomain': 'acme'},
         'apps': apps,
         'users': users,
         'users_staged': users[:5],
@@ -1582,22 +1583,22 @@ def generate_demo_data():
         'users_deprovisioned': users[:8],
         'groups': groups,
         'idps': idps,
-        'agents': [{'id': 'agent001', 'name': 'Ross-AD-Agent-Pool'}],
+        'agents': [{'id': 'agent001', 'name': 'Acme-AD-Agent-Pool'}],
         'auth_policies': auth_policies,
         'mfa_policies': auth_policies[:2],
         'password_policies': auth_policies[:3],
         'signon_policies': auth_policies[:2],
         'features': features,
-        'trusted_origins': [{'id': 'to001', 'origin': 'https://vendors.rossstores.com'},
-                             {'id': 'to002', 'origin': 'https://vendor-stg.rossstores.com'}],
+        'trusted_origins': [{'id': 'to001', 'origin': 'https://vendors.acmecorp.com'},
+                             {'id': 'to002', 'origin': 'https://vendor-stg.acmecorp.com'}],
         'tokens': [{'id': 'tok001', 'name': 'Automation-Token'},
                    {'id': 'tok002', 'name': 'Monitoring-Token'}],
         'app_assignments': {
             f'0oa{i:015d}': {
                 'user_count': random.randint(5, 200),
                 'group_names': random.sample(
-                    ['Ross-Employees', 'Ross-Contractors', 'Ross-IT-Admins',
-                     'Ross-Finance', 'Ross-HR', 'Ross-Vendors'], k=random.randint(1, 3)
+                    ['Acme-Employees', 'Acme-Contractors', 'Acme-IT-Admins',
+                     'Acme-Finance', 'Acme-HR', 'Acme-Vendors'], k=random.randint(1, 3)
                 ),
             }
             for i in range(len(app_names))
@@ -1617,10 +1618,10 @@ def generate_demo_data():
 # ─── MAIN ──────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Okta Inventory Script — Ross Stores")
-    parser.add_argument("--url", help="Okta org URL, e.g. https://ross.okta.com")
+    parser = argparse.ArgumentParser(description="Okta Inventory Script")
+    parser.add_argument("--url", help="Okta org URL, e.g. https://acme.okta.com")
     parser.add_argument("--token", help="Okta API token (SSWS)")
-    parser.add_argument("--output", default="Okta_Inventory_Ross.xlsx", help="Output Excel filename")
+    parser.add_argument("--output", default="Okta_Inventory.xlsx", help="Output Excel filename")
     parser.add_argument("--demo", action="store_true", help="Generate demo/template with sample data")
     args = parser.parse_args()
 

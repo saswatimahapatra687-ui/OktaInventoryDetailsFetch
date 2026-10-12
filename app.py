@@ -18,7 +18,7 @@ except Exception as _import_err:
     st.stop()
 
 st.set_page_config(
-    page_title="Okta Inventory — Ross Stores",
+    page_title="Okta Inventory",
     page_icon="🔐",
     layout="wide",
 )
@@ -105,7 +105,7 @@ with col_dl:
     st.download_button(
         label="📥 Download Excel",
         data=st.session_state["excel_bytes"],
-        file_name="Okta_Inventory_Ross.xlsx",
+        file_name="Okta_Inventory.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         use_container_width=True,
         type="primary",
